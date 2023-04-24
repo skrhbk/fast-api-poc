@@ -19,10 +19,16 @@ passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.3.1"
+httpx = "^0.24.0"
+pytest-cov = "^4.0.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-
-#[tool.setuptools.package-data]
-#myModule = ["*.csv"]
+[tool.pytest.ini_options]
+pythonpath = [
+  "src"
+]

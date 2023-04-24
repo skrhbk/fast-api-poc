@@ -10,3 +10,6 @@ poetry show --tree
 
 
 poetry install
+poetry add pytest httpx pytest-cov --group dev
+
+pytest --cov=./ --cov-report=html tests/
