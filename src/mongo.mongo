@@ -1,0 +1,16 @@
+
+db.createUser( { user: "fastapi",
+                 pwd: passwordPrompt(),
+                 roles: [ { role: "readWrite", db: "fastapi" }] })
+
+db.createCollection("users")
+
+db.users.insert({
+        username: "johndoe",
+        full_name: "John Doe",
+        email: "johndoe@example.com",
+        hashed_password: "$2b$12$Btff6n6AUk/YLupTMdxX1OuWo35Yhh/ooolK8UuHrnDxEaFGtbA2e",
+        disabled: false,
+    })
+
+db.users.find({username:'johndoe'})
