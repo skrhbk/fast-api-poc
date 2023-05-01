@@ -1,8 +1,16 @@
+import pathlib
+from configparser import ConfigParser
 import pymongo
 import urllib.parse
 from pydantic_mongo import AbstractRepository
 from pymongo.database import Database
-from .model import User
+from myapp.database.model import User
+from myapp.log import getLogger
+
+conf = ConfigParser()
+conf.read(f"{pathlib.Path(__file__).parent}/app.ini")
+
+logger = getLogger("MongoClient")
 
 
 class UserRepository(AbstractRepository[User]):
@@ -24,10 +32,10 @@ class MyMongoContext:
 class MyMongo:
     def __init__(self):
         host = "localhost"
-        username = urllib.parse.quote_plus('fastapi')
-        password = urllib.parse.quote_plus('fastapi')
-        self.client = pymongo.MongoClient(f"mongodb://{username}:{password}@{host}:27017")
-        self.db: Database = self.client.get_database("fastapi")
+        username = urllib.parse.quote_plus(conf['mongodb']['USER'])
+        password = urllib.parse.quote_plus(conf['mongodb']['PASSWORD'])
+        self.client = pymongo.MongoClient(f"mongodb://{username}:{password}@{host}:{conf['mongodb']['PORT']}")
+        self.db: Database = self.client.get_database(conf['mongodb']['DB'])
         # db.list_collections()
         print(f"Authenticated: {username}")
 
@@ -42,6 +50,6 @@ class MyMongo:
 if __name__ == "__main__":
     mongo = MyMongo()
     u = mongo.get_user("johndoe")
-    print(u)
-    print(u.username)
+    logger.info(u)
+    logger.info(u.username)
     mongo.close()

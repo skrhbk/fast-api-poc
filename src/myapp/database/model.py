@@ -9,7 +9,7 @@ from bson import ObjectId
 class User(BaseModel):
     id: ObjectIdField = None
     username: str
-    hashed_password: str
+    hashed_password: Union[str, None] = None
     email: Union[EmailStr, None] = None
     full_name: Union[str, None] = None
     disabled: Union[bool, None] = None
@@ -20,3 +20,7 @@ class User(BaseModel):
 
 # class UserInDB(User):
 #     hashed_password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
