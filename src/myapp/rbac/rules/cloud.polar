@@ -12,7 +12,7 @@ resource Cloud {
   "user" if "admin";
 }
 
-# This rule tells Oso how to fetch roles
+# have a role to act on a cloud|region|resource
 has_role(_actor: ActorClass, role_name: String, cloud: Cloud) if
   role in _actor.roles and
   role_name = role.role_name and

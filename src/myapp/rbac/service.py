@@ -1,18 +1,19 @@
 import glob
-import json
 from logging import getLogger
 from typing import List
-from fastapi import Request
 
 import oso
+from fastapi import Request
 from pydantic import BaseModel
 from pymongo.collection import Collection
 from pymongo.results import InsertOneResult
 
 from myapp import utils
-from myapp.rbac.models import RoleRepository, Role, RoleCreate
 from myapp.clouds.models import Cloud
 from myapp.database.mongo import MyMongo
+from myapp.jobs.models import ProjectAuthorizable
+from myapp.rbac.exceptions import AuthorizationNotFound, AuthorizationForbidden
+from myapp.rbac.models import RoleRepository, Role, RoleCreate
 
 logger = getLogger("RoleService")
 
@@ -28,6 +29,7 @@ class RoleService:
         self._coll: Collection = db.db.roles
         
         _oso = oso.Oso()
+        _oso.register_class(ProjectAuthorizable)
         _oso.register_class(Cloud)
         _oso.register_class(Request)
         _oso.register_class(ActorClass)
@@ -37,8 +39,17 @@ class RoleService:
     def authorize(self, actor_type: str, actor_id: str, action: str, resource):
         roles = self.list_roles({"actor_type": actor_type, "actor_id": actor_id})
         actor = ActorClass(roles=roles)
-        logger.info(f"Authorize for actor[{actor}], action[{action}], resource[{resource}]")
-        self._oso.authorize(actor, action, resource)
+        logger.debug(f"Authorize for actor[{actor}], action[{action}], resource[{resource}]")
+        try:
+            self._oso.authorize(actor, action, resource)
+        except oso.NotFoundError as e:
+            msg = "Resource not found or you don't have any permission on it"
+            logger.warning(f"{msg}")
+            raise AuthorizationNotFound(msg)
+        except oso.ForbiddenError as e:
+            msg = "You have any permission on them"
+            logger.warning(f"{msg}")
+            raise AuthorizationForbidden(msg)
 
     def list_roles(self, cond: dict):
         repo = RoleRepository(database=self._db)
