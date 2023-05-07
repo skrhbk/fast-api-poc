@@ -6,16 +6,23 @@ from pydantic_mongo import AbstractRepository, ObjectIdField
 
 
 class CloudPatch(BaseModel):
-    resources: List[str]
+    gpu: int
+    descr: str
+    is_public: bool
 
 
 class CloudCreate(CloudPatch):
-    cloud: str
+    resource: str
+    name: str
     region: str
 
 
 class Cloud(CloudCreate):
     id: ObjectIdField = None
+
+    @property
+    def key(self):
+        return f"{self.name}|{self.region}|{self.resource}"
 
     class Config:
         json_encoders = {ObjectId: str}

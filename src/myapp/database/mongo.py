@@ -1,14 +1,14 @@
 import pathlib
-from configparser import ConfigParser
-import pymongo
-from pymongo import MongoClient
 import urllib.parse
-from pydantic_mongo import AbstractRepository
-from pymongo.database import Database, Collection
+from configparser import ConfigParser
 
+from pydantic_mongo import AbstractRepository
+from pymongo import MongoClient
+from pymongo.database import Database
+
+from myapp import utils
 from myapp.database.model import User
 from myapp.log import getLogger
-
 
 logger = getLogger("MongoClient")
 
@@ -34,7 +34,7 @@ class UserRepository(AbstractRepository[User]):
 class MyMongo:
     def __init__(self):
         conf = ConfigParser()
-        conf.read(f"{pathlib.Path(__file__).parent}/app.ini")
+        conf.read(utils.get_sibling_file_path(__file__, "app.ini"))
 
         host = "localhost"
         username = urllib.parse.quote_plus(conf['mongodb']['USER'])
@@ -58,13 +58,20 @@ if __name__ == "__main__":
     # logger.info(u)
     # logger.info(u.username)
 
-    from myapp.clouds.models import Cloud, CloudRepository
-    repo = CloudRepository(database=mongo.db)
-    # c = Cloud(cloud="gcp", region="us1", resources=["a1", "a2", "gpu"])
-    c = Cloud(cloud="aws", region="jp", resources=["a1", "a2", "gpu"])
-    repo.save(c)
+    # c = Cloud(name="gcp", region="us1", gpu=8, resource="a2", descr="Powerful GPU2")
+    # repo.save(c)
+    # c = Cloud(name="aws", region="jp", gpu=4, resource="a1", descr="Powerful GPU1")
+    # repo.save(c)
 
-    # logger.info(repo.find_one_by({'cloud': "gcp"}))
+    # from myapp.rbac.models import RoleRepository, Role
+    # repo = RoleRepository(database=mongo.db)
+    # data = {"actor_type": "project", "actor_id": "900001", "role_name": "user", "resource": "gcp|us1|a2"}
+    # r = Role(**data)
+    # repo.save(r)
+
+    from myapp.clouds.models import CloudRepository, Cloud
+    repo = CloudRepository(database=mongo.db)
+    logger.info(repo.find_one_by({'name': "gcp"}))
     q = repo.get_pagination_query({}, after=0, before=10)
     logger.info(f"{q}: {list(repo.find_by(q))}")
     mongo.close()

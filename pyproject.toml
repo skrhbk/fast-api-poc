@@ -20,6 +20,7 @@ python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 python-keycloak = "^2.16.0"
 authlib = "^1.2.0"
 aiohttp = "^3.8.4"
+oso = "^0.27.0"
 
 
 [tool.poetry.group.dev.dependencies]

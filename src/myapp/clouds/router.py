@@ -31,21 +31,21 @@ async def list_clouds(
     return s.list_cloud()
 
 
-@router.get("/{cloud}", response_model=List[Cloud], response_model_exclude_unset=True)
-async def get_clouds(cloud: str,
+@router.get("/{name}", response_model=List[Cloud], response_model_exclude_unset=True)
+async def get_clouds(name: str,
                      db: Annotated[MyMongo, Depends(get_db)],
                      _: Annotated[User, Depends(get_current_active_user)]):
     """
     List all from one of the clouds
     :return:
     """
-    logger.info(f"get_clouds [{cloud}]")
+    logger.info(f"get_clouds [{name}]")
     s = CloudService(db)
-    return s.get_cloud(cloud)
+    return s.get_cloud(name)
 
 
-@router.patch("/{cloud}/{region}", response_model_exclude_unset=True)
-async def patch_cloud(cloud: str, region: str,
+@router.patch("/{name}/{region}/{resource}", response_model_exclude_unset=True)
+async def patch_cloud(name: str, region: str, resource: str,
                       cloud_patch: CloudPatch | None,
                       db: Annotated[MyMongo, Depends(get_db)],
                       _: Annotated[User, Depends(get_current_active_user)]):
@@ -53,25 +53,25 @@ async def patch_cloud(cloud: str, region: str,
     Patch one of the clouds
     :return:
     """
-    logger.info(f"patch cloud [{cloud}] + region[{region}]")
+    logger.info(f"patch cloud [{name}] + region[{region}] + resource[{resource}]")
     s = CloudService(db)
-    return s.update_cloud(cloud, region, cloud_patch)
+    return s.update_cloud(name, region, resource, cloud_patch)
 
 
-@router.delete("/{cloud}/{region}", response_model_exclude_unset=True)
-async def delete_cloud(cloud: str, region: str,
-                      db: Annotated[MyMongo, Depends(get_db)],
-                      _: Annotated[User, Depends(get_current_active_user)]):
+@router.delete("/{name}/{region}/{resource}", response_model_exclude_unset=True)
+async def delete_cloud(name: str, region: str, resource: str,
+                       db: Annotated[MyMongo, Depends(get_db)],
+                       _: Annotated[User, Depends(get_current_active_user)]):
     """
     Delete one of the clouds
     :return:
     """
-    logger.info(f"delete cloud [{cloud}] + region[{region}]")
+    logger.info(f"delete cloud [{name}] + region[{region}] + resource[{resource}]")
     s = CloudService(db)
-    return s.delete_cloud(cloud, region)
+    return s.delete_cloud(name, region, resource)
 
 
-@router.post("/{cloud}/{region}", response_model_exclude_unset=True)
+@router.post("/{name}/{region}/{resource}", response_model_exclude_unset=True)
 async def create_cloud(cloud_create: CloudCreate,
                        db: Annotated[MyMongo, Depends(get_db)],
                        _: Annotated[User, Depends(get_current_active_user)]):
