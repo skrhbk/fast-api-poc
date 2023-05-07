@@ -1,11 +1,12 @@
+import uvicorn
 from fastapi import Depends, FastAPI
 from typing_extensions import Annotated
 
-from .auth import router as auth_router
-from .auth.dependencies import get_current_active_user
-from .clouds import router as cloud_router
-from .rbac import router as role_router
-from .database.model import User
+from myapp.auth import router as auth_router
+from myapp.auth.dependencies import get_current_active_user
+from myapp.clouds import router as cloud_router
+from myapp.rbac import router as role_router
+from myapp.database.model import User
 
 app = FastAPI(debug=True)
 
@@ -26,3 +27,7 @@ async def read_own_items(
     current_user: Annotated[User, Depends(get_current_active_user)]
 ):
     return [{"item_id": "Foo", "owner": current_user.username}]
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0")

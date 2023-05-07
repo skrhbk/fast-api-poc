@@ -5,7 +5,7 @@ from fastapi import Depends
 from myapp.database.mongo import MyMongo
 
 
-def get_db() -> Generator:
+async def get_db() -> Generator:
     try:
         db = MyMongo()
         yield db

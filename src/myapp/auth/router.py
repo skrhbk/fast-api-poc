@@ -2,7 +2,7 @@ from datetime import timedelta
 from logging import getLogger
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 
 from .models import Token
@@ -20,6 +20,7 @@ router = APIRouter(
 
 @router.post("", response_model=Token)
 async def login_for_access_token(
+    request: Request,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: db_dep
 ):
